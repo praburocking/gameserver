@@ -1,10 +1,10 @@
 const jwt=require('jsonwebtoken')
-const config =require('./config')
+const config =require('../util/config')
 const url = require('url');
-const auth =require('../models/authentication')
+const auth =require('../model/authorization')
 
 
-const header="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+const header=config.SECURITY_HEADER
 const authorization= async (request,response,next)=>
 {
     console.log("url" ,url.parse(request.url).pathname);

@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const config=require('../../../util/config')
+const config=require('../util/config')
 const uniqueValidator = require('mongoose-unique-validator')
 mongoose.set('useFindAndModify', false)
 

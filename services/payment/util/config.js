@@ -1,0 +1,14 @@
+require('dotenv').config()
+
+let MONGODB_URL = process.env.MONGODB_URL
+let PAYMENT_SECRET=process.env.PAYMENT_SECRET
+let STRIPE_WEBHOOK_SECRET=process.env.STRIPE_WEBHOOK_SECRET
+let ENVIRONMENT=process.env.ENVIRONMENT
+
+
+module.exports = {
+  MONGODB_URL,
+ PAYMENT_SECRET,
+ STRIPE_WEBHOOK_SECRET,
+ ENVIRONMENT
+}
