@@ -3,16 +3,17 @@ const bodyParser = require('body-parser')
 const cors=require('cors')
 // const morgan=require('morgan')
 // const fs = require('fs')
-const path = require('path')
-const custmidware=require('./util/middleware')
+//const path = require('path')
+//const custmidware=require('./util/middleware')
+const authorization=require('./services/authorization/core/authorization')
 
 //controllers
-// const signupRouter = require('./controllers/signup')
+ const signupRouter = require('./services/authorization/core/controllers/signup')
 
-// const loginRouter=require('./controllers/login')
-// const logoutRouter=require('./controllers/logout')
+const loginRouter=require('./services/authorization/core/controllers/login')
+const logoutRouter=require('./services/authorization/core/controllers/logout')
 // const heroRouter=require('./controllers/hero')
-// const paymentRouter=require('./controllers/payments')
+const paymentRouter=require('./services/payment/core/controllers/payments')
 
 
 //logs req and response
@@ -35,11 +36,11 @@ app.use(
 app.use(bodyParser.json())
 app.use(cors())
 // app.use(morgan('combined', { stream: accessLogStream }))
-app.use(custmidware.authorization);
+app.use(authorization);
 app.use('/api/login',loginRouter);
 app.use('/api/logout',logoutRouter);
 app.use('/api/signup',signupRouter);
-app.use('/api/hero',heroRouter);
+// app.use('/api/hero',heroRouter);
 app.use('/api/pay',paymentRouter);
 
 

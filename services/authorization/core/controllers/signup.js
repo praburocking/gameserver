@@ -2,6 +2,7 @@
 const signupRouter = require('express').Router()
 const User = require('../../model/user')
 const md5=require('md5')
+
 signupRouter.post('/', async (request, response) => {
   try {
     const body = request.body
