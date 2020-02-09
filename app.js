@@ -22,7 +22,7 @@ const paymentRouter=require('./services/payment/core/controllers/payments')
 
 const app = express()
 
-app.use(express.static('build'))
+
 app.use(
   express.json({
     verify: function(req, res, buf) {
@@ -36,12 +36,13 @@ app.use(
 app.use(bodyParser.json())
 app.use(cors())
 // app.use(morgan('combined', { stream: accessLogStream }))
-app.use(authorization);
+app.use('/api/',authorization);
 app.use('/api/login',loginRouter);
 app.use('/api/logout',logoutRouter);
 app.use('/api/signup',signupRouter);
 // app.use('/api/hero',heroRouter);
 app.use('/api/pay',paymentRouter);
+app.use(express.static('build'))
 
 app.get('*', (req,res) =>{
   console.log(__dirname+'/build/index.html');
