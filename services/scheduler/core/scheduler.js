@@ -3,7 +3,7 @@ const Scheduler=require('../models/scheduler')
 const funct=require('../util/funct')
 const async=require('async')
 const moment=require('moment')
-const sendSlackMsg= require('../../notification/slack/slack')
+const sendSlackMsg= require('../../notification/slack/core/slack')
 let cronTime="*/15 * * * * *"
 
 const runCurrentJobs=async (job,funct_keys,callback) =>{
@@ -70,7 +70,7 @@ new cronJob(cronTime,onTick,onComplete,start,timeZone);
 }
 
 //schedule job using this function
-const ScheduleJob=async (params,user,repeat_interval,time,funct,remaining_cycle)=>
+const scheduleJob=async (params,user,repeat_interval,time,funct,remaining_cycle)=>
 {
 try{
    if( typeof params==="object" && typeof user==="string" && typeof repeat_interval==="object" && typeof time==="object" && typeof funct==="string" && typeof remaining_cycle==="number")
@@ -95,4 +95,4 @@ catch(exp)
 }
 }
 
-module.exports ={runScheduler,ScheduleJob};
+module.exports ={runScheduler,scheduleJob};

@@ -1,4 +1,4 @@
-const config=require('../../../util/config')
+const config=require('../util/config')
 const axios=require('axios')
 
 

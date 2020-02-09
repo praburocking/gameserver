@@ -3,6 +3,7 @@ const signupRouter = require('express').Router()
 const User = require('../../model/user')
 const md5=require('md5')
 const utils =require('../utils')
+const mail=require('../../../notification/mail/mail')
 
 signupRouter.post('/', async (request, response) => {
   try {
@@ -18,8 +19,11 @@ signupRouter.post('/', async (request, response) => {
     })
 
     const savedUser = await user.save()
+
     if(savedUser && body.password && body.email)
-    {
+    { 
+       //mail(body.email,'Hi welcome to ArkOnline',text);
+       utils.invitationMail(body.email,savedUser.name,savedUser.__id);
         const loginData=await utils.login({email:body.email,password:body.password})
         if(loginData.message)
         {
