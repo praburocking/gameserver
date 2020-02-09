@@ -5,9 +5,9 @@ const http= require('http')
 //const slack=require('./services/notification/slack/slack')
 const moment=require('moment')
 const dotenv=require('dotenv')
-
+const sendmail=require('./services/notification/mail/mail')
 const server = http.createServer(app)
-
+sendmail()
 
 //const scheduled_job=scheduler.ScheduleJob({},"sendnotification",{seconds:30},new Date(),"sendnotification",12);
 //scheduler.runScheduler()

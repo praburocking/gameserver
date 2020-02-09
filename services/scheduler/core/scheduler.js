@@ -68,6 +68,8 @@ const runScheduler=()=>
 new cronJob(cronTime,onTick,onComplete,start,timeZone);
 
 }
+
+//schedule job using this function
 const ScheduleJob=async (params,user,repeat_interval,time,funct,remaining_cycle)=>
 {
 try{

@@ -29,7 +29,9 @@
     "moment": "^2.24.0",
     "mongoose": "^5.8.9",
     "mongoose-unique-validator": "^2.0.3",
+    "nodemailer": "^6.4.2",
     "nodemon": "^2.0.2",
+    "shelljs": "^0.8.3",
     "stripe": "^8.7.0"
   },
   "devDependencies": {

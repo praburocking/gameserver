@@ -43,9 +43,9 @@ app.use('/api/signup',signupRouter);
 // app.use('/api/hero',heroRouter);
 app.use('/api/pay',paymentRouter);
 
-
-// app.get('/', (req, res) => {
-//   res.send('<h1>Hello World this is rocking!</h1>')
-// })
+app.get('*', (req,res) =>{
+  console.log(__dirname+'/build/index.html');
+  res.sendFile(path.join(__dirname+'/build/index.html'));
+});
 
 module.exports=app;

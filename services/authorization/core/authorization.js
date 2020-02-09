@@ -15,10 +15,11 @@ const authorization= async (request,response,next)=>
     {
         try{
         token=authorization.substring(7)
-        
+        console.log("token => ",token);
         let authData= await auth.find({key:token})//.map(data=>data.toJSON());
+       
         authData=authData[0];
-
+        console.log("authData=> ",config.SECRET);
         if(authData)
         {
         token=header+"."+authData.payload+"."+token
@@ -43,7 +44,7 @@ const authorization= async (request,response,next)=>
     }
     catch(exp)
     {
-        response.status(401).json({message:"invalid token"}).send()
+        response.status(401).json({message:"exception while signing out "+exp}).send()
     }
     }
     else

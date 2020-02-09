@@ -3,45 +3,24 @@ const User = require('../../model/user')
 const md5=require('md5')
 const jwt=require('jsonwebtoken')
 const Auth=require('../../model/authorization')
+const utils =require('../utils')
 
 
 
 loginRouter.post('/',async (req,res)=>{
     try{
     const body=req.body;
-    if(body.user_name && body.password)
+    if(body.email && body.password)
     {
-        const user=await User.findOne({name:body.user_name})
-        if(user)
-        {   console.log("user =>",user);
-            if(user.passwordHash===md5(body.password))
-            {
-            const userForToken = {
-                name: user.name,
-                id: user._id,
-              }
-            
-            let token=jwt.sign(userForToken,process.env.SECRET)
-            const splitToken=token.split(".")
-            console.log("splitToken =>",splitToken);
-            const auth =new Auth({key:splitToken[2],payload:splitToken[1]});
-           //token = await Auth.add({key:splitToken[2],payload:splitToken[1]}).toJSON();
-           token=await auth.save();
-           token=token.toJSON();
-
-            res.status(200).json({token:token.key,username:user.name,id:user._id}).send()
-            }
-            else
-            {
-                res.status(401).json({message:"user not found or invalid username/password"}).send() 
-            }
+        const loginData=await utils.login({email:body.email,password:body.password});
+        if(loginData.message)
+        {
+            res.status(401).json(loginData).send()
         }
         else
         {
-            res.status(401).json({message:"user not found or invalid username/password"}).send()
+            res.status(200).json(loginData).send()
         }
-
-
     }
     else
     {
