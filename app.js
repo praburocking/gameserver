@@ -40,7 +40,6 @@ app.use('/api/',authorization);
 app.use('/api/login',loginRouter);
 app.use('/api/logout',logoutRouter);
 app.use('/api/signup',signupRouter);
-// app.use('/api/hero',heroRouter);
 app.use('/api/pay',paymentRouter);
 app.use(express.static('build'))
 

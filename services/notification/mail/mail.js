@@ -4,9 +4,9 @@ const config=require('./util/config')
 
 console.log("mail config",config);
 var transporter = nodemailer.createTransport({
-  host: "smtp-mail.outlook.com", // hostname
+  host:config.MAIL_DOMAIN, // hostname
   secureConnection: false, // TLS requires secureConnection to be false
-  port: 587, // port for secure SMTP
+  port: config.MAIL_PORT, // port for secure SMTP
   tls: {
      ciphers:'SSLv3'
   },
@@ -17,7 +17,7 @@ var transporter = nodemailer.createTransport({
 });
 
 var mailOptions = {
-  from: 'prabumohan96@outlook.in',
+  from: config.MAIL_ID,
   to: 'prabumohan96@gmail.com',
   subject: 'Sending Email using Node.js',
   html: 'That was easy!'
