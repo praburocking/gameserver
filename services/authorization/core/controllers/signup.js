@@ -52,4 +52,29 @@ signupRouter.post('/', async (request, response) => {
 
 })
 
+
+signupRouter.get('/exist',async(req,res)=>{
+  console.log("request",req);
+
+  if(req.query.email)
+  {   
+      console.log(req.query)
+      const user=await User.findOne({email:req.query.email});
+      if(user)
+      { 
+        res.status(200).json({status:true});
+      }
+      else
+      {
+        res.status(200).json({status:false});
+      }
+  }
+  else
+  {
+    res.status(400).json({message:"invalid data"});
+  }
+
+
+})
+
 module.exports = signupRouter
