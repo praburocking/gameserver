@@ -3,7 +3,7 @@ const bodyParser = require('body-parser')
 const cors=require('cors')
 // const morgan=require('morgan')
 // const fs = require('fs')
-//const path = require('path')
+const path = require('path')
 //const custmidware=require('./util/middleware')
 const authorization=require('./services/authorization/core/authorization')
 
@@ -12,8 +12,9 @@ const authorization=require('./services/authorization/core/authorization')
 
 const loginRouter=require('./services/authorization/core/controllers/login')
 const logoutRouter=require('./services/authorization/core/controllers/logout')
-// const heroRouter=require('./controllers/hero')
+
 const paymentRouter=require('./services/payment/core/controllers/payments')
+const forgotRouter=require('./services/authorization/core/controllers/forgotPasword')
 
 
 //logs req and response
@@ -41,6 +42,8 @@ app.use('/api/login',loginRouter);
 app.use('/api/logout',logoutRouter);
 app.use('/api/signup',signupRouter);
 app.use('/api/pay',paymentRouter);
+app.use('/api/forgotpassword',forgotRouter.forgotPassRouter);
+app.use('/api/resetpass',forgotRouter.resetPasswordRouter);
 app.use(express.static('build'))
 
 app.get('*', (req,res) =>{

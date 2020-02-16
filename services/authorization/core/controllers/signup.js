@@ -16,13 +16,13 @@ signupRouter.post('/', async (request, response) => {
       name: body.user_name?body.user_name:body.email.split("@")[0],
       email:body.email,
       passwordHash:md5(passwordHash),
+      isVerified:false
     })
 
     const savedUser = await user.save()
 
     if(savedUser && body.password && body.email)
     { 
-       //mail(body.email,'Hi welcome to ArkOnline',text);
        utils.invitationMail(body.email,savedUser.name,savedUser.__id);
         const loginData=await utils.login({email:body.email,password:body.password})
         if(loginData.message)

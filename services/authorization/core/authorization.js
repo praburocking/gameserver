@@ -2,9 +2,10 @@ const jwt=require('jsonwebtoken')
 const config =require('../util/config')
 const url = require('url');
 const auth =require('../model/authorization')
+ const utils=require('./utils')
 
 
-const header=config.SECURITY_HEADER
+
 const authorization= async (request,response,next)=>
 {
     console.log("url" ,url.parse(request.url).pathname);
@@ -15,32 +16,27 @@ const authorization= async (request,response,next)=>
     {
         try{
         token=authorization.substring(7)
-        console.log("token => ",token);
-        let authData= await auth.find({key:token})//.map(data=>data.toJSON());
-       
-        authData=authData[0];
-        console.log("authData=> ",config.SECRET);
-        if(authData)
-        {
-        token=header+"."+authData.payload+"."+token
-        token=jwt.verify(token,config.SECRET)
-        if(token && token.id)
+
+        token=await utils.verifyToken(token,"login");
+            console.log("token ",token);
+
+        if(token && token.id )
         {
             response.locals.user_id=token.id;
             response.locals.user_name=token.name;
-            response.locals.key=authData.key;
+            response.locals.key=authorization.substring(7);
             next()
             
         }
-        else
+        else if(token==="token-expired")
         {
-            response.status(401).json({message:"Error while validating"}).send()
+            response.status(401).json({message:"token exipred"}).send()
         }
-    }
-    else
-    {
-        response.status(401).json({message:"invalid token"}).send()
-    }
+        else if(token==="token-invalid")
+        {
+            response.status(401).json({message:"token invalid"}).send()
+        }
+        
     }
     catch(exp)
     {

@@ -15,9 +15,10 @@ mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }).then
 
 
 const userSchema=new mongoose.Schema({
-    name:{type:String,unique:true,required:true,minlength:5},
-    email:{type:String,unique:true,required:true,minlength:7},
-    passwordHash:{type:String,required:true,minlength:8}
+    name:{type:String,required:true},
+    email:{type:String,unique:true,required:true},
+    passwordHash:{type:String,required:true,minlength:8},
+    isVerified:{type:Boolean,required:true}
   })
 
 

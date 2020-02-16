@@ -9,8 +9,10 @@ const Auth=require('../../model/authorization')
 logoutRouter.post('/',async (req,res)=>{
     try{
 
+        
+        console.log("at logout ",res.locals)
         if(res.locals.key)
-    {
+    {  
         const removeRes=await Auth.deleteOne({key:res.locals.key})
         res.status(200).json({message:"signed out"}).send()
     }
