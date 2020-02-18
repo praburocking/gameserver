@@ -15,6 +15,7 @@ const logoutRouter=require('./services/authorization/core/controllers/logout')
 
 const paymentRouter=require('./services/payment/core/controllers/payments')
 const forgotRouter=require('./services/authorization/core/controllers/forgotPasword')
+const verifyUserRouter=require('./services/authorization/core/controllers/verifyUser')
 
 
 //logs req and response
@@ -44,6 +45,7 @@ app.use('/api/signup',signupRouter);
 app.use('/api/pay',paymentRouter);
 app.use('/api/forgotpassword',forgotRouter.forgotPassRouter);
 app.use('/api/resetpass',forgotRouter.resetPasswordRouter);
+app.use('/api/verifyuser',verifyUserRouter);
 app.use(express.static('build'))
 
 app.get('*', (req,res) =>{

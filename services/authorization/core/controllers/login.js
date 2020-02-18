@@ -1,10 +1,5 @@
 const loginRouter = require('express').Router()
-const User = require('../../model/user')
-const md5=require('md5')
-const jwt=require('jsonwebtoken')
-const Auth=require('../../model/authorization')
 const utils =require('../utils')
-
 
 
 loginRouter.post('/',async (req,res)=>{
@@ -12,7 +7,7 @@ loginRouter.post('/',async (req,res)=>{
     const body=req.body;
     if(body.email && body.password)
     {
-        const loginData=await utils.login({email:body.email,password:body.password});
+        const loginData=await utils.login({email:body.email,password:body.password},false);
         if(loginData.message)
         {
             res.status(401).json(loginData).send()

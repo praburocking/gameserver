@@ -89,21 +89,18 @@ if(body.token && body.password )
     console.log("token3",token);
     if(token && typeof token==="object")
     {
-  let user= await User.findOne({_id:token.id});
-  console.log("user before passchange",user);
-
-   user= await User.update({_id:token.id} ,{passwordHash:md5(body.password)});
-   user= await User.findOne({_id:token.id});
-   console.log("user after passchange",user);
-   if(user)
-   {
-
-    res.status(200).json({email:token.name,status:true});
-   }
-   else
-   {
-    res.status(500).json({message:"exception while updating password"}).send()
-   }
+        let user= await User.findOne({_id:token.id});
+        console.log("user before passchange",user);
+        user= await User.update({_id:token.id} ,{passwordHash:md5(body.password)});
+        console.log("user after passchange",user);
+        if(user)
+        {
+            res.status(200).json({email:token.name,status:true});
+        }
+        else
+        {
+            res.status(500).json({message:"exception while updating password"}).send()
+         }
     }
     else if(token && typeof token==='string')
     {

@@ -25,8 +25,7 @@ const authorization= async (request,response,next)=>
             response.locals.user_id=token.id;
             response.locals.user_name=token.name;
             response.locals.key=authorization.substring(7);
-            next()
-            
+            next()  
         }
         else if(token==="token-expired")
         {

@@ -24,7 +24,7 @@ signupRouter.post('/', async (request, response) => {
     if(savedUser && body.password && body.email)
     { 
        utils.invitationMail(body.email,savedUser.name,savedUser.__id);
-        const loginData=await utils.login({email:body.email,password:body.password})
+        const loginData=await utils.login({email:body.email,password:body.password},true);
         if(loginData.message)
         {
           response.status(400).json(loginData.message);

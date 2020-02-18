@@ -7,14 +7,27 @@ const sendmail=require('../../notification/mail/mail')
 const scheduler=require('../../scheduler/core/scheduler');
 const config =require('../util/config')
 
-  const login=async (data)=>
+  const login=async (data,fromSignup)=>
 {
     const user=await User.findOne({email:data.email,passwordHash:md5(data.password)})
         if(user)
-        {   
-          let token= await issueToken(user,60*60*48,"login")
-          console.log("token ",token );
-           return ({token:token.key,username:user.name,id:user._id})
+        { 
+          if( !user.isVerified )
+            {
+              let token= await issueToken(user,60*15,"verifyUser",true);
+              const link=config.SERVER_URL+"/verifyUser?token="+token.key;
+              verifyUserMail(user.email, user.name,link);
+            }
+
+          if(fromSignup || user.isVerified )
+            {
+              let token= await issueToken(user,60*60*48,"login")
+              return ({token:token.key,username:user.name,id:user._id})
+            }
+         else 
+            {
+              return({message:"user not verified sent a verification mail"});
+            }
         }
         else
         {
@@ -38,7 +51,14 @@ const forgotPasswordMail=(to,username,link)=>
     scheduler.scheduleJob([to,sub,text],username,{},new Date(),"sendMail",0)
 }
 
-const issueToken=async (user,expiry,action)=>
+const verifyUserMail=(to,username,link)=>
+{
+  const text="Hi "+username+" ! <br> <p> please click on the link to verify your account, the link will be active for only next 15 minutes.</p> <p> please click here <a href='"+link+"'>"+link+"</a></p><br> with regards<br>Prabu.M" 
+    const sub="password recovery link"
+    scheduler.scheduleJob([to,sub,text],username,{},new Date(),"sendMail",0)
+}
+
+const issueToken=async (user,expiry,action,isDelPrevToken)=>
 {
   try{
     const actions=["revivePassword","login","verifyUser"]
@@ -64,8 +84,7 @@ return token;
   catch(exp)
   {
     console.log("exception ",exp);
-}
-
+  }
 }
 
 const verifyToken=async (token,action,isRemove)=>
