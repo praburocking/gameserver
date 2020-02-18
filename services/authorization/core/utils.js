@@ -12,7 +12,7 @@ const config =require('../util/config')
     const user=await User.findOne({email:data.email,passwordHash:md5(data.password)})
         if(user)
         { 
-          if( !user.isVerified )
+          if( !user.isVerified)
             {
               let token= await issueToken(user,60*15,"verifyUser",true);
               const link=config.SERVER_URL+"/verifyUser?token="+token.key;
