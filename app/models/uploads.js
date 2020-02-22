@@ -29,6 +29,7 @@ const fileSchema=new mongoose.Schema({
       returnedObject.id=returnedObject._id.toString()
       delete returnedObject._id
       delete returnedObject.__v
+      delete returnedObject.private_key
     }
 
   })

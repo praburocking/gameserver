@@ -32,11 +32,11 @@ fileRouter.get('/list',async(req,res)=>{
     try{
 
        const files= await util.getFiles();
-       res.status(200).json({...files}).send();
+       res.status(200).json([...files]).send();
     }
     catch(exp)
     {
-        res.status(500).json({message:"exception while getting files list"}).send()
+        res.status(500).json({message:"exception while getting files list"});
         console.log("exception while getting the file ",exp);
     }
 })
