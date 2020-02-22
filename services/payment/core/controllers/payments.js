@@ -40,7 +40,6 @@ catch(exp)
 
 paymentRouter.post('/stripe/webhook',async(req,res)=>
 {
-   
     try{
         if (config.STRIPE_WEBHOOK_SECRET) {
             // Retrieve the event by verifying the signature using the raw body and secret.
