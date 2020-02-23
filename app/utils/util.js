@@ -13,10 +13,14 @@ var storage = multer.diskStorage({
 
 var upload = multer({ storage: storage }).single('file')
 
-const addFile=async (name,format,user_id,private_key)=>
+const addFile=async (name,format,user_id,private_key,size,encoding,md5,truncated)=>
 {
+  // format:{type:String,required:true},
+  //   size:{type:Number,required:true},
+  //   encoding:{type:String},
+  //   md5:{type:String}
     try{
-        const file=new File({name:name,format:format,user_id:user_id,private_key:private_key})
+        const file=new File({name:name,format:format,user_id:user_id,private_key:private_key,size:size,encoding:encoding,md5:md5,truncated:truncated})
         const savedFile=await file.save()
         return savedFile
 

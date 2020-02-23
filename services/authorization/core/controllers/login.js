@@ -5,6 +5,7 @@ const utils =require('../utils')
 loginRouter.post('/',async (req,res)=>{
     try{
     const body=req.body;
+    console.log("login body",body);
     if(body.email && body.password)
     {
         const loginData=await utils.login({email:body.email,password:body.password},false);

@@ -18,7 +18,11 @@ const fileSchema=new mongoose.Schema({
     name:{type:String,required:true},
     user_id:{type:String,required:true,minlength:20},
     private_key:{type:String,required:true,minlength:8},
-    format:{type:String,required:true}
+    format:{type:String,required:true},
+    size:{type:Number,required:true},
+    encoding:{type:String},
+    md5:{type:String},
+    truncated:{type:Boolean}
   })
 
 

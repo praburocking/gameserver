@@ -1,14 +1,11 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors=require('cors')
-// const morgan=require('morgan')
-// const fs = require('fs')
 const path = require('path')
-//const custmidware=require('./util/middleware')
+const fileupload = require('express-fileupload')
 const authorization=require('./services/authorization/core/authorization')
-
 //controllers
- const signupRouter = require('./services/authorization/core/controllers/signup')
+const signupRouter = require('./services/authorization/core/controllers/signup')
 
 const loginRouter=require('./services/authorization/core/controllers/login')
 const logoutRouter=require('./services/authorization/core/controllers/logout')
@@ -20,12 +17,8 @@ const fileRouter=require('./app/controllers/fileRouter')
 
 
 //logs req and response
-// var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
-
 
 const app = express()
-
-
 app.use(
   express.json({
     verify: function(req, res, buf) {
@@ -38,7 +31,8 @@ app.use(
 
 app.use(bodyParser.json())
 app.use(cors())
-// app.use(morgan('combined', { stream: accessLogStream }))
+// app.use('/api/',fileupload);
+app.use('/api/',fileupload());
 app.use('/api/',authorization);
 app.use('/api/login',loginRouter);
 app.use('/api/logout',logoutRouter);

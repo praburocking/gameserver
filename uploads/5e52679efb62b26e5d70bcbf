@@ -1,0 +1,284 @@
+<%-- $Id$--%>
+<%@page import="com.zoho.crm.core.entity.util.CrmModuleConstants"%>
+<%@page import="com.zoho.crm.core.security.util.LicenseUtil"%>
+<%@page import="com.adventnet.ds.query.QueryConstants" %>
+<%@page import="com.zoho.crm.core.meta.tabs.TabUtil"%>
+<%@page import="com.adventnet.sas.ds.SASThreadLocal"%>
+<%@page import="com.adventnet.crm.ignite.util.CrmIgniteUtil"%>
+<%@page import="com.zoho.crm.core.meta.fields.FieldUtil"%>
+<%@ page contentType="text/html; charset=UTF-8" language="java"	errorPage="/jsp/common/Failure.jsp" import="java.util.*"%>
+<%@page import="com.adventnet.crm.common.util.PersistenceCacheUtil"%>
+<%@page import="com.adventnet.adventnetcrmsfa.CRMMODEFIELD"%>
+<%@page import="com.adventnet.adventnetcrmsfa.CRMFIELD"%>
+<%@page import="com.adventnet.adventnetcrmsfa.CRMPOTENTIAL"%>
+<%@page import="com.adventnet.adventnetcrmsfa.CRMOPPORTUNITYSTAGE"%>
+<%@page import="com.adventnet.adventnetcrmsfa.CRMOPPSTAGELAYOUTREL"%>
+<%@page	import="com.adventnet.crm.customization.fields.util.CrmFieldUtil"%>
+<%@page	import="com.adventnet.crm.customization.fields.util.FieldDependencyUtil"%>
+<%@page	import="com.adventnet.crm.customization.relatedlist.util.RelatedListUtil"%>
+<%@page import="com.adventnet.persistence.DataObject"%>
+<%@page import="com.adventnet.persistence.Row"%>
+<%@page import="com.adventnet.persistence.Persistence"%>
+<%@page import="java.lang.Exception"%>
+<%@page import="com.adventnet.ds.query.Column"%>
+<%@page import="com.adventnet.ds.query.Criteria"%>
+<%@page import="com.adventnet.ds.query.QueryConstants"%>
+<%@page import="com.adventnet.ds.query.SelectQuery"%>
+<%@page import="com.adventnet.ds.query.SelectQueryImpl"%>
+<%@page import="com.adventnet.ds.query.Table"%>
+<%@page import="java.io.BufferedReader"%>
+<%@page import="java.io.FileReader"%>
+<%@page import="java.io.FileWriter"%>
+<%@page import="java.io.PrintWriter"%>
+<%@page import="java.io.File"%>
+<%@page import="com.adventnet.ds.query.Range"%>
+<%@page import="com.adventnet.ds.query.UpdateQuery"%>
+<%@page import="com.adventnet.ds.query.Join"%>
+<%@page import="com.adventnet.ds.query.UpdateQueryImpl"%>
+<%@page import="com.adventnet.adventnetcrmsfa.CRMSECTION"%>
+<%@page	import="com.adventnet.crm.customization.section.util.SectionUtil"%>
+<%-- <%@page import="com.adventnet.crm.security.util.UserUtil"%> --%>
+<%@page import="org.json.JSONArray"%>
+<%@page import="org.json.JSONObject"%>
+<%@page import="com.adventnet.crm.api.v2.commons.CrmModules"%>
+<%@page import="com.adventnet.crm.api.v2.commons.CrmUsers"%>
+<%@page import="com.zoho.crm.core.security.util.OrgUtil"%>
+<%@page import="com.adventnet.crm.common.util.CrmConstants"%>
+<%@page	import="com.adventnet.crm.custommodule.handler.CustomModuleHandler"%>
+<%@page import="com.adventnet.crm.custommodule.util.CustomModuleJsonValidate"%>
+<%@page import="com.adventnet.crm.authorization.util.SecurityUtil"%>
+<%@page import="com.adventnet.crm.iam.util.ZohoCRMIAMUtil"%>
+<%@page import="java.util.HashSet"%>
+<%@page import="com.adventnet.iam.ServiceOrgAPI"%>
+<%@page import="com.zoho.accounts.AccountsConstants"%>
+<%@page import="com.adventnet.iam.ServiceOrg"%>
+<%@page import="com.zoho.crm.core.security.util.CrmEnvironment"%>
+<%@page import="com.adventnet.adventnetcrmsfa.CRMPICKLISTLAYOUTREL"%>
+<%@page import="java.util.logging.Logger"%>
+<%@page import="java.util.logging.Level"%>
+<%@page import="com.adventnet.adventnetcrmsfa.CRMLAYOUTFIELDPROPERTIES"%>
+<%@page import="com.zoho.crm.core.meta.layouts.PageLayoutUtil"%>
+<%@page import="com.adventnet.adventnetcrmsfa.CRMPICKLISTVALUES"%>
+<%@page import="com.adventnet.crm.common.util.ComboDBService"%>
+<%@page import="com.adventnet.adventnetcrmsfa.CRMPICKLISTLAYOUTREL"%>
+<%@page import="com.adventnet.adventnetcrmsfa.CRMTAB"%>
+<%@page import="com.adventnet.iam.IAMProxy"%>
+<%@page import="com.adventnet.iam.UserAPI"%>
+<%@page import="com.adventnet.iam.User"%>
+<%@page import="com.zoho.crm.core.meta.fields.CoreFieldConstants"%>
+<%@page import="com.zoho.crm.core.constants.PMDConstants"%>
+<%@page import="com.adventnet.persistence.DataAccessException"%>
+<%@page import="com.adventnet.crm.activities.calls.NewCallsViewMigrator"%>
+<%@page import="com.adventnet.crm.ignite.util.CrmIgniteUtil"%>
+<%
+
+try{
+	
+final Logger LOGGER = Logger.getLogger("BiginProductForFreeAndEventWhoId");//No i18N
+String[] email_Ids={
+	"aathimaniraj.b@zohocorp.com","amsaveni.r@zohocorp.com","l.narayan77@yahoo.com","lakshminarayan.jk+2@zohocorp.com","lakshminarayan.jk@zohocorp.com","ponmala.k+mylive@zohotest.com","prabu.mohan+lakcrm@zohotest.com","karthipanraj.k+biginlocal11@zohocorp.com","karthipanraj.k+biginlocal@zohocorp.com","karthipanraj.k+biginnew@zohocorp.com","karthipanraj.k+ignitelocal@zohocorp.com","karthipanraj.k@zohocorp.com","karthipanrajit@gmail.com","velkumar.p@zohocorp.com","ponmala.k@zohocorp.com","pravinkumar.panchatcharam@zohocorp.com","muthu.kumar+20@zohocorp.com","muthu.kumar@zohocorp.com","akshaya.v+1@zohocorp.com","akshaya.v+biginidc@zohocorp.com","akshaya.v@zohocorp.com","viswa.akshaya+3@gmail.com","viswa.akshaya+4@gmail.com","viswa.akshaya+5@gmail.com","viswa.akshaya+5@zohocorp.com","viswa.akshaya+6@gmail.com","viswa.akshaya+7@gmail.com","ponnusamy@zohocorp.com","lakshminarayan.jk@zohocorp.com","prabu.mohan@zohocorp.com","sathish.m+123@zohocorp.com","sathish.m+liveadmin@zohocorp.com","sathish.m@zohocorp.com","venkateswaran.s@zohocorp.com","prabu.mohan@zohocorp.com","araman@zohocorp.com","gururajasubbaiah.sj@zohocorp.com","haribabu.p@zohocorp.com","hariharaprabu.n@zohocorp.com","samir.zoho@gmail.com","velkumar.p@zohocorp.com","vijay.k@zohocorp.com","lakshminarayan.jk@zohocorp.com","muthu.kumar@zohocorp.com","ponmala.k@zohocorp.com","arunkumar.g@zohocorp.com","raghavan.balchand+bigint0@zohotest.com","rajasekar.karthigaisamy+090@zohocorp.com","rajasekar.karthigaisamy@zohocorp.com","muralidharan.a@zohocorp.com","balavignesh.j@zohocorp.com","meenaloshini.r@zohocorp.com","lokesh.sr@zohocorp.com","arunkumar.g+t30@zohotest.com","arunkumar.g@zohocorp.com","jaiganeshb+t30@zohotest.com","subramanian.chidambara+t30@zohotest.com","yuvaraj.n+bigin@zohocorp.com","yuvaraj.n+t30@zohotest.com","yuvaraj.n@zohocorp.com","akshaya.v@zohocorp.com","arunkumar.g+bigin1@zohotest.com","arunkumar.g@zohocorp.com","kalyan.pavan@zohocorp.com","karthipanraj.k@zohocorp.com","lakshminarayan.jk@zohocorp.com","lokesh.sr@zohocorp.com","meenaloshini.r@zohocorp.com","muthu.kumar@zohocorp.com","ponmala.k@zohocorp.com","prabu.mohan@zohocorp.com","pravinkumar.panchatcharam@zohocorp.com","rajasekar.karthigaisamy@zohocorp.com","sathish.m@zohocorp.com","venkat.s2110@gmail.com","venkateswaran.s+bigin10@zohotest.com","venkateswaran.s+bigin11@zohotest.com","venkateswaran.s+bigin12@zohotest.com","venkateswaran.s+bigin1@zohotest.com","venkateswaran.s+bigin2@zohotest.com","venkateswaran.s+bigin3@zohotest.com","venkateswaran.s+bigin4@zohotest.com","venkateswaran.s+bigin5@zohotest.com","venkateswaran.s+bigin6@zohotest.com","venkateswaran.s+bigin7@zohotest.com","venkateswaran.s+bigin8@zohotest.com","venkateswaran.s+bigin9@zohotest.com","venkateswaran.s@zohocorp.com","vivek.sb@zohocorp.com","yatheesh.r@zohocorp.com","jayakumar.i@zohocorp.com","sujitha.devi+normalt0@zohotest.com","sujitha.devi+normalt0u1@zohotest.com","dal.thapa+t0@zohotest.com","janakiraman.s+t0@zohotest.com","mohammed.idhiris+t0@zohotest.com","sujitha.devi+datat0@zohotest.com","b@g.com","sujitha.devi+bulkt0@zohotest.com","sujitha.devi+bulkt0u1@zohotest.com","sujitha.devi+normalt0@zohotest.com","vignesh.vr+idc1@zohotest.com","haryvigneswar.sk@zohocorp.com","pascal@nsisolution.com","arnab@glionconsulting.com","janakiraman.s+8@zohocorp.com","janakiraman.s+t0@zohotest.com","mohammed.idhiris+t0@zohotest.com","mohammed.idhiris.t0@zohotest.com","shankaran.l+idc1@zohotest.com","simon.s+11@zohotest.com","test@test.com","umashri.r@zohocorp.com","vignesh.v+idc1@zohotest.com","vignesh.vr+idc1@zohotest.com","vignesh.vr+idcsub1@zohotest.com","lakshmanraj.s+telepbx1@zohocorp.com","vignesh.vr+idc1@zohotest.com","vignesh.vr+idcba@zohotest.com","vignesh.vr+idcms@zohotest.com","vignesh.vr+idcsub1@zohotest.com","vignesh.vr+idcsub2@zohotest.com","vignesh.vr+idcsub3@zohotest.com","vignesh.vr+idct0@zohotest.com","vignesh.vr+idcsub1@zohotest.com","vignesh.vr+idcsub2@zohotest.com","vignesh.vr+idct0@zohotest.com","vignesh.vr+idcno@zohotest.com","dal.thapa+1t0@zohotest.com","dal.thapa+t0@zohotest.com","matchendran.s@zohocorp.com","justin.smal@monread.com","bigintest1byvivek@gmail.com","dal.thapa+t0@zohotest.com","mohammed.idhiris+t0@zohotest.com","mohammed.idhiris+t1@zohotest.com","mohammed.idhiris@zohocorp.com","sumanth.g+bigint0@zohotest.com","sumanth.g@zohocorp.com","vettrivel+t0@zohotest.com","vettrivel.a+bigint0@zohotest.com","vettrivel.a+t0@zohotest.com","gopal.c@zohocorp.com","janakiraman.s+t0@zohotest.com","shankaran.l+idc1@zohotest.com","shankaran.l+idcnoda@zohotest.com","shankaran.l+idcsub1@zohotest.com","shankaran.l+idcsub2@zohotest.com","shankaran.l+idcsub3@zohotest.com","shankaran.l+idcsub4@zohotest.com","shankaran.l+idct0@zohotest.com","sujitha.devi@zohocorp.com","sumanth.g@zohocorp.com","shankaran.l+idc1@zohotest.com","shankaran.l+idcnoda@zohotest.com","shankaran.l+idct0@zohotest.com","rdevarona@relightdepot.com","pbrouillard@cliniquevi.com","eric@iaspireapp.com",
+"janakiraman.s+t0@abc.com","shankaran.l+idc1@zohotest.com","shankaran.l+idcnoda@zohotest.com","shankaran.l+idcsub1@zohotest.com","shankaran.l+idct0@zohotest.com","sathish.selvarajan+bigin_test1@zohotest.com","raghavan.balchand+bigint0@zohotest.com","raghavan.balchand@zohocorp.com","mohammed.idhiris+t0@zohotest.com","pazhamalai.m+bigindelete2@zohotest.com","pazhamalai.m+bigindelete@zohotest.com","pazhamalai.m+bigint0@zohotest.com","pazhamalai.m+bigint1@zohotest.com","pazhamalai.m+bigint2@zohotest.com","pazhamalai.m+dismantleyourself@zohotest.com","rapunzeljones123@gmail.com","sumanth.g@zohocorp.com","vettrivel.a+bigint0@zohotest.com","vettrivel.a+bigint3@zohotest.com","vettrivel.a+t0@zohotest.com","arunray@zohocorp.com","raghavan.balchand+bigint0@zohotest.com","raghavan.balchand@zohocorp.com","rajasekar.karthigaisamy+0901@zohocorp.com","sadhika.sr@zohocorp.com","simonpackiaraj29+a1@gmail.com","kovilpillai@zohocorp.com","shawn.c@zohocorp.com","vettrivel.a+bigint0@zohotest.com","vettrivel.a+bigint2@zohotest.com","vettrivel.a+t0@zohotest.com","ramkishore.kg@zohocorp.com","A.Rechards@integramar.com","notifications@integramar.com","gunaseelan.n@zohocorp.com","ksenthil+vt2bigint0@zohotest.com","ksenthil+vto2demo@zohocorp.com","ksenthil@zohocorp.com","nivethitha.kv@zohocorp.com","srihari.ms@zohocorp.com","varun.suresh@zohocorp.com","vijayaragavan.m@zohocorp.com","vishalkumarverma.s@zohocorp.com","vt2demo@zoho.com","nivethitha.kv@zohocorp.com","srihari.ms@zohocorp.com","vijayaragavan.m@zohocorp.com","vishalkumarverma.s@zohocorp.com","vijayaragavan.m@zohocorp.com","nivethitha.kv@zohocorp.com","srihari.ms@zohocorp.com","burrows.amelia@zylker.com","hills.martha@zylker.com","joane.lee@zylker.com","rao.raghav@zylker.com","vidyapriya@zohocorp.com","sadhika.sr+t0@zohotest.com","matchendran.s+bigint0@zohotest.com","venkateswaran.s@zohocorp.com","sujitha.devi+designt0@zohotest.com","ksenthil+vto2demo@zohocorp.com","joemaher@opusbono.org","jyothi.s@zohocorp.com","james.raja@zohocorp.com","vignesh.jc@zohocorp.com","akshaya.v+3@zohocorp.com","arun.v@zohocorp.com","samir.zoho+1@gmail.com","samir.zoho+2@gmail.com","samir.zoho@gmail.com","arkham@royalweb.email","arkhamorgotham@gmail.com","arkhamorgotham@protonmail.com","arkhamorgotham@zohomail.in","error@engineer.com","gabc@u.dmarc.ro","mabc@u.dmarc.ro","nydc@laoho.com","pramilav@zohocorp.com","preethy.s@zohocorp.com","sample@gmail.com","sample@someone.ai","sprasadh@zohocorp.com","vignesh.jc@zohocorp.com","vigneshjayaprakash7@gmail.com","viswa.akshaya+10@gmail.com","yoda@zylker.com","mohammed.idhiris+t0@zohotest.com","mohammed.idhiris+t1@zohotest.com","pazhamalai.m+releasetest@zohotest.com","vigneshkumar.rp@zohocorp.com","viswa.akshaya+11@gmail.com","sathish.m+99@zohotest.com","viswa.akshaya+13@gmail.com","storetestingxyz@gmail.com","satzuntouched@gmail.com","akshaya.v+testsearch@zohocorp.com","shankaran.l+idc1@zohotest.com","shawnbigin@gmail.com","vignesh.vr@zohocorp.com","akshaya.v+testing1@zohocorp.com","karishma.r@zohocorp.com","jayaprakash.d@zohocorp.com","selvarasu.k@zohocorp.com","selvarasu.kk@gmail.com","selvarasuk1997@gmail.com","lakshmanakumar.s@zohocorp.com","ram.s@zohocorp.com","vikash.kumaran@zohocorp.com","aravindh.ramasamy@zohocorp.com","manickavasagam.m@zohocorp.com","shankaran.l+subuser1@zohocorp.com","sairam.s@zohocorp.com","sasintheran.v@zohocorp.com","rapunzeljones123@gmail.com","shankaran.l+idcnoda@zohotest.com","shankaran.l+idct0@zohotest.com","shankaran.l@zohocorp.com","sujitha.devi@zohocorp.com","subash@zohocorp.com","sujitha.devi+20@zohocorp.com","raghunath.r@zohocorp.com","viswa.akshaya+14@gmail.com","lokesh.sr+biginjul10@zohotest.com","venkateswaran.s@zohocorp.com","jayasurya.m@zohocorp.com","vidhyadevi.p@zohocorp.com","kalyan.pavan+2@zohocorp.com","kalyan.pavan@zohocorp.com","lokesh.sr@zohocorp.com","viswa.akshaya+15@gmail.com","pazhani.gk@zohocorp.com","akshaya.v+testbigin@zohotest.com","manividya43+43@gmail.com","manividya43+44@gmail.com","mithesh.m@zohocorp.com","akshaya.v+biginidc5@zohocorp.com","akshaya.v+testbigin1@zohotest.com","viswa.akshaya+10@gmail.com","subhajit.d@zohocorp.com","akshaya.v+biginidc1@zohotest.com","akshaya.v+biginidc2@zohotest.com","venkateswaran.s+bigin1@zohotest.com","venkateswaran.s+bigin2@zohotest.com","venkateswaran.s+bigin3@zohotest.com","venkateswaran.s+bigin4@zohotest.com","venkateswaran.s+bigin5@zohotest.com","akshaya.v+biginidc3@zohotest.com","arunkumar.ca@zohocorp.com","javier@infovisual.com","sathisht@zohocorp.com","dsolovyev@migbusiness.ru","araman@zohocorp.com","sarath.tr@zohocorp.com","sai.r@zohocorp.com","nareshram.l@zohocorp.com","deepak.thangavelu@zohocorp.com","balaji.cs@zohocorp.com","jeeven.j@zohocorp.com","testen@crmstrategen.nl","willem3@crmstrategen.nl","baskar.j@zohocorp.com","haluk.cavusoglu@cloudyflex.com","ramaneshnandan.t@zohocorp.com","deepu.s@zohocorp.com","pradeep.au@zohocorp.com","rohan.s@zohocorp.com","rino.bertolotto@stesa.it","averdu@neointec.com","saravanan.gm@zohocorp.com",
+"ecastro@youprism.com","iliana.breton@mdocorp.com","marian.rueda@mdocorp.com","miguel.angel@mdocorp.com","michael.milford@zohocorp.com","victor@kilidan.com","admin@nuanced.it","admin@connectingteams.net","baohoajim@starmotion.vn","gururajasubbaiah.sj+crm2018@zohocorp.com","ananth.te@zohocorp.com","dnirmal@zohocorp.com","marcelomorem@mextres.com.br","muthuraja@zohocorp.com","gobinath.k@zohocorp.com","delisa@djltraining.com","shanmugam.p@zohocorp.com","gururajasubbaiah.sj@zohocorp.com","ramsankar.cr@zohocorp.com","pazhamalai.m+dismantleyourself@zohotest.com","anantharaman.v@zohocorp.com","clifford.a@zohocorp.com","thiyagarajan.s@zohocorp.com","dhanaveeran.g@zohocorp.com","lokesh.sr@zohocorp.com","venkateswaran.s@zohocorp.com","veera.s@zohocorp.com","nobuyuki.takeo@fujixerox.co.jp","tomonori.tezuka@fujixerox.com","vijayr@zohocorp.com","denil.c@zohocorp.com","charan.teja@zohocorp.com","sellakkumaran.s@zohocorp.com","kriti.v@zohocorp.com","bhuvaneshwari.p@zohocorp.com","shankaranarayanan.kr@zohocorp.com","vinodh.mm@zohocorp.com","rohith.k@zohocorp.com","dineshkumar.bp@zohocorp.com","boons7733@gmail.com","vishnuvardhan.a@zohocorp.com","ravikumaran.p@zohocorp.com","anish.m@zohocorp.com","rajkumar.d@zohocorp.com","vijayanand.k@zohocorp.com","hariharasudhan.v@zohocorp.com","srividhyalakshmi.k@zohocorp.com","rejitha.sp@zohocorp.com","sripathy.ramesh@zohocorp.com","balakumar.k@zohocorp.com","manoj.rs@zohocorp.com","kirankumar@zohocorp.com","vignesh.raja@zohocorp.com","ritika.dr@zohocorp.com","krzysztof.salasinski@zpartner.pl","miron.matecki@zpartner.pl","koushik.d@zohocorp.com","saivigneshu.b@zohocorp.com","julien@idayit.com","vijayakrishna.p+one@zohocorp.com","karthik.selvan@zohocorp.com","lingeswaran.m@zohocorp.com","luiscastro@loba.pt","logeshwar.v@zohocorp.com","jagannath.g@zohocorp.com","info@instawebworks.com.au","janakiraman.s@zohocorp.com","aniel.sriram@apora.nl","brett@zenatta.com","mahi@zohocorp.com","erkan+bigin@gloocrm.com","deepan.r@zohocorp.com","ebihara@kitebiz.net","fujikawa@kitebiz.net","yamaga@kitebiz.net","vasanthan.m@zohocorp.com","raju.b@zohocorp.com","velmurugan.v@zohocorp.com","mianniruberto@bluroot.co","prabu@zohocorp.com","xiahf@zohocorp.com","goutham.r@zohocorp.com","madhumitha.vvm@zohocorp.com","sathish.dk@zohocorp.com","nagarajan.anbazhagan@zohocorp.com","mukil.g@zohocorp.com","arunkumar.c@zohocorp.com","sruthi.s@zohocorp.com","anandaseelan.ln@zohocorp.com","pragatheswaran.v@zohocorp.com","renukhadevi.s@zohocorp.com","natarajan.m@zohocorp.com","bharathraj.y@zohocorp.com","prakash.suresh@zohocorp.com","rakeeb.rafeeque@zohocorp.com","tanvi.l@zohocorp.com","anandhu.m@zohocorp.com","dineshbabu.g@zohocorp.com","vignesh.vr+idcsub5@zohotest.com","sabarinathan.g@zohocorp.com","shankaran.l+idcfresh@zohotest.com","surendar.d@zohocorp.com","venkatesan.mani@zohocorp.com","aparna.ta@zohocorp.com","narasingamoorthi.e@zohocorp.com","saranbabu@zohocorp.com","vijayan.t@zohocorp.com","senthamil@zohocorp.com","prashanth.vk@zohocorp.com","sindu.kb@zohocorp.com","sam@ardento.com.au","daniel@turbox.me","jmartinez@visiontecno.com","veena.t@zohocorp.com","arunkumar.cr@zohocorp.com","paula@creativeanalysis.co.uk","bob@twelvethree.com","geoff@twelvethree.com","stephen@twelvethree.com","sridhar.iyengar@zohocorp.com","laxmikanth.sadula@zohocorp.com","test@test.com","lavanya.k@zohocorp.com","karthik.mv@zohocorp.com","chandramouli.dorai@zohocorp.com","jaravindhan@zohocorp.com","sripriya.rk@zohocorp.com","ignacio@redecorporativa.com","vivek.prabakaran@zohocorp.com","john@camco-direct.com","mageshkumaar.m@zohocorp.com","kristen@zohelpers.com","mike@zohelpers.com","balaji.ja@zohocorp.com","testsystem@thecrmexpert.com","dayanithi.d@zohocorp.com","rob@arisesolutions.co.nz","akshay.venkatesh@zohocorp.com","dilip+french@zohocorp.com","venkateswaran.k@zohocorp.com","bigintest1byvivek@gmail.com","gobisvivek@gmail.com","prabu.mohan@zohocorp.com","vivek.sb+1@zohotest.com","vivek.sb@zohocorp.com","vivekgbsenthil@gmail.com","pnandhini@zohocorp.com","ramchiranjeevi@zohocorp.com","svembu@zohocorp.com","vignesh.prakash@zohocorp.com","jin.nakazawa@zohocorp.com","ramakrishnan.d@zohocorp.com","elanchezhiyan.v@zohocorp.com","arungowtham.a@zohocorp.com","vignesh.ramesh@zohocorp.com","abinesh.s@zohocorp.com","david.egerton@icloud.com","yudai.michisaka@zohocorp.com","maurizio@servizipremium.com","akshaya.v+testcm@zohocorp.com","sriskandalingam.m@zohocorp.com","arjun.s@zohocorp.com","arun.vs@zohocorp.com","benny@zohocorp.com","bryan@zohocorp.com","carla.garcia@zohocorp.com","darrylstork@zohocorp.com","ian@zohocorp.com","jinilsreejayan.k@zohocorp.com","joel.victorian@zohocorp.com","john.paulraj@zohocorp.com","jose.valentin@zohocorp.com","maheshk@zohocorp.com","mani@zohocorp.com","manoj.alexy@zohocorp.com","norm@zohocorp.com","peter.balaji@zohocorp.com","raghu.alse@zohocorp.com","rajmohan.s@zohocorp.com","scott.mcphail@zohocorp.com","gordon@relativity.co.uk","sugan.v@zohocorp.com","info@onlinemastery.co.uk","max.perez@smf360.com",
+"suganthan.p@zohocorp.com","sunil.lalvani@zohocorp.com","vincent@zohocorp.com","yogesh.m@zohocorp.com","admin@miempresa.sagitaz.com","markheydon@mhcg.co.uk","saranyag@zohocorp.com","logesh.g@zohocorp.com","selva.venkatesh@zohocorp.com","subashni.arasu@zohocorp.com","prasanth.v@zohocorp.com","jayaraj.d@zohocorp.com","prakash.sekar@zohocorp.com","vignesh.gnanasekaran@zohocorp.com","natalie@zoftware.org","vag@chenzconsulting.com","zoho-us@marxup.de","subashram.s@zohocorp.com","michel.nauwelaers@curema.be","armando.delucia@crmpartners.it","renganath.k@zohocorp.com","support@senthuraa.com","keerthi.varshini@zohocorp.com","crmplustest@gmail.com","marcus@stor7.com","shankaran.l@zohocorp.com","benhur.m@zohocorp.com","mohammed.idhiris+t0@zohotest.com","pazhamalai.m+bigint0@zohotest.com","pazhamalai.m+bigint1@zohotest.com","pazhamalai.m+bigint2@zohotest.com","shankaran.i+idcnoda@zohotest.com","shankaran.l+idc1@zohotest.com","sumanth.g+bigint0@zohotest.com","sumanth.g+bigint1@zohotest.com","sumanth.g@zohocorp.com","sumanthcrmtest98@gmail.com","sumanthcrmttest97@gmail.com","zoho@crmsparrow.com","ismail.fareed@zohocorp.com","shankaran.l@zohocorp.com","sumanth.g@zohocorp.com","vijayraj.jain@zohocorp.com","sathishkumar.g@zohocorp.com","radha@spikra.com","dhanasekar.b@zohocorp.com","ashwin.krishnamurthy@zohocorp.com","jebin.es@zohocorp.com","raghuraaj.am@zohocorp.com","priyabrata.c@zohocorp.com","gowtham.selvaraj@zohocorp.com","thiyagaraj.d@zohocorp.com","siddarth.v@zohocorp.com","prasath.k@zohocorp.com","muthukumar.marikani@zohocorp.com","arunkumar.mg@zohocorp.com","anudeep.ks@zohocorp.com","senthilkumar.n@zohocorp.com","akshaya.v+testnew@zohocorp.com","ponmala.k+aug06_19@zohotest.com","cliffton.kent@zohocorp.com","akshaya.v+testbigin2@zohotest.com","akshaya.v+cmbigin@zohotest.com","akshaya.v+bigin@zohotest.com","akshaya.v+testcrm@zohocorp.com","gunaseelan.n@zohocorp.com","lakshmanraj.s@zohocorp.com","mani@zohocorp.com","piers.foster@xist2.com","karantanna@kayimpex.com","jayavignesh.a+tets@zohocorp.com","lokesh.sr+30@zohotest.com","sathish.m+deskscope@zohotest.com","mukilarasan.r@zohocorp.com","akshaya.v+cm2@zohotest.com","mariselvam.muthusamy+3@zohocorp.com","mariselvam.muthusamy@zohocorp.com","ponmala.k+aug13_19@zohotest.com","akshaya.v+mailchimp@zohocorp.com","murugappan.vr@zohocorp.com","sathishr@zohocorp.com","gururajasubbaiah+bigin_aug@gmail.com","akshaya.v+bigincm@zohotest.com","akshaya.v@zohocorp.com","muthuraj.v+live@zohocorp.com","aravind.rb@zohocorp.com","viswaprasath.s@zohocorp.com","viswa.akshara@gmail.com","akshaya.v+4@zohocorp.com","max.bravo@generadorweb.net","ernesto.reyes@provpoder.mx","vighnesh.s@zohocorp.com","dradke@ambassadorcollege.education","john@alloutenterprises.net","info@mandeeptoor.com","andy@oncallers.com","xenios@computercat.com","inbox@arshsahzad.com","afonseca@topsolutions.pt","jlee@remax.net","karthikeyan.ss@zohocorp.com","prabu.k@zohocorp.com","ml@amp.systems","woodconnect@zoho.com","adi@gkblabs.com","balasundar.c@zohocorp.com","akshaya.v+zcm@zohotest.com","michael.graffeo@myccmortgage.com","vag@michaelgraffeo.com","patkar.p@anvayaa.com","bill.quinn@1cloudconsultants.com","rajvikram.s@zohocorp.com","arun.srinivasan@zohocorp.com","athira.r@zohocorp.com","gopal@zohocorp.com","guruvyshali.g@zohocorp.com","madhumitha.v@zohocorp.com","nicholas.koh@zohocorp.com","radhika.d@zohocorp.com","srinidhi.ms@zohocorp.com","summer@zohocorp.com","rcardenas@dynamo.pe","montreal.creation@gmail.com","gtavacuum@gmail.com","antoine@brainsolutions.be","jasonk@solutionstosuccess.com.au","vn@aarialife.com","mithun.v@zohocorp.com","alagu.elanthirian@zohocorp.com","ranjith.t@zohocorp.com","thangam@zohocorp.com","ravichandran.mp@zohocorp.com","mbalaganesh@zohocorp.com","prabakaran.d@zohocorp.com","vibhav.vs@zohocorp.com","jayasuriya.s@zohocorp.com","vignesh.ramakrishnan@zohocorp.com","prathik.s@zohocorp.com","siva.m@zohocorp.com","andrews.ba@zohocorp.com","sathyanarayanan.k@zohocorp.com","balachandar.s@zohocorp.com","raja.s@zohocorp.com","guru.sundaresan@zohocorp.com","harishankar.g@zohocorp.com","suvish.v@zohocorp.com","karthikeyan.partheeban@zohocorp.com","rachit.arora@zohocorp.com","bharani.aravind@zohocorp.com","mani.t@zohocorp.com","sivaprasad.r@zohocorp.com","terence.m@zohocorp.com","manojsabareesh.r@zohocorp.com","shyam.sankar@zohocorp.com","thamimansari.a@zohocorp.com","nadeemahamed.b@zohocorp.com","harithash.iv@zohocorp.com","vinieth.ss@zohocorp.com","ugandra.s@zohocorp.com","balaprassanna.i@zohocorp.com","shadrick.m@zohocorp.com","srinivash.arumugam@zohocorp.com","achuthan.r@zohocorp.com","jenson.j@zohocorp.com","rohit.maheswar@zohocorp.com","goyal.p@zohocorp.com","raju@zohocorp.com","karthikeyan.pr@zohocorp.com","jcy912@zoho.com","prashant.jha@zohocorp.com","kalyan.g@zohocorp.com","harish.p@zohocorp.com","kaartic.sn@zohocorp.com","sreekrishna.s@zohocorp.com","karthickraj.p@zohocorp.com","sabarinathan@zohocorp.com","suganthan.s@zohocorp.com","steffy.e@zohocorp.com","sarath.rp@zohocorp.com",
+"rajagopal.c@zohocorp.com","benhur.m@zohocorp.com","ishraq@zen360consult.com","preethy.s@zohocorp.com","vikhram.g@zohocorp.com","arun.k@zohocorp.com","saravanan.ar@zohocorp.com","jeevaa.devaraj@zohocorp.com","santhoshkumar.ap@zohocorp.com","kokilan.k@zohocorp.com","arun.kr@zohocorp.com","aishwarya.a@zohocorp.com","chandrakumar.selvaraj@zohocorp.com","arunray@zohocorp.com","pazhamalai.m@zohocorp.com","shreyaas.v@zohocorp.com","apps@constantech.biz","samir@zohocorp.com","gautham.gm@zohocorp.com","govindarajan.an@zohocorp.com","swaminathan.j@zohocorp.com","kali@doss.com","sprasadh@zohocorp.com","dal.thapa@zohocorp.com","smrithil@zohocorp.com","vijayaraj.s@zohocorp.com","nithya.ks@zohocorp.com","barathan@zohocorp.com","koodalingam.p@zohocorp.com","earl@storytellingbeancounter.com","juleshwar.babu@zohocorp.com","krishnakumar@zohocorp.com","joshua.t@zohocorp.com","nagarajan.c@zohocorp.com","cad@cadplus.ba","divya.subbiah@zohocorp.com","dinaash.ra@zohocorp.com","jayamurugan.r@zohocorp.com","muthusamy.s@zohocorp.com","mohammed.idhiris+t0@zohotest.com","mohammed.idhiris@zohocorp.com","pazhamalai.m+releasetest@zohotest.com","shankaran.l+harry@zohotest.com","cherry@yeezyconsulting.com","genette@yeezysites.com","vincent@yeezygroup.us","sarah@zohocorp.com","srinivasan.p@zohocorp.com","akshaya.v+newinvite@zohocorp.com","srimathy.l@zohocorp.com","karthikadevi.m@zohocorp.com","morgan.brady@su.org","stephen.r@zohocorp.com","wendy.g@zohocorp.com","chakaravarthi.r@zohocorp.com","janakiraman.s+8@zohocorp.com","gunaseelan.n@zohocorp.com","ksenthil+vt2bigint0@zohotest.com","ksenthil+vto2demo@zohocorp.com","venkateswaran.s+bigin13@zohotest.com","venkateswaran.s+bigin14@zohotest.com","samuel.r@zohocorp.com","balaganesh@zohocorp.com","michael@thecraingroup.com","john@martin-sloane.com","admin@infothink.com.au","mohammed.idhiris+t0@zohotest.com","pazhamalai.m+bigint0@zohotest.com","rapunzeljones123@gmail.com","shankaran.l+idcnoda@zohotest.com","sujitha.devi+idct0t0@zohotest.com","sujitha.devi+idct0t1@zohotest.com","aravind.siva@zohocorp.com","harrygoedhart@gmail.com","gowtham.br@zohocorp.com","hari.krishnan@gmail.com","hamleysinc1a@gmail.com","shankaran.l+idcnoda@zohotest.com","venkateswaran.s+bigin15@zohotest.com","viswa.akshaya+20@gmail.com","priyanka.rv@zohocorp.com","aiswarya.v@zohocorp.com","blake@zohocorp.com","vinod.k@zohotest.com","pranesh.s@zohocorp.com","azeezkhan.m@zohocorp.com","aravind.ramadhas@zohocorp.com","m.batista@appsimplantadores.com","mariano@appsimplantadores.com","raul@appsimplantadores.com","shivram.r@zohocorp.com","naresh.b+bigin@zohotest.com","aravind.janardhanan@zohocorp.com","sebastien.scarciello@speakerwise.com","matteo.rodighiero@cloudnova.it","jg.edmond@ixsis.fr","muniyasamy@zohocorp.com","kuppulakshmi.k@zohocorp.com","balaguru.surendar@zohocorp.com","shanmugasundaram@zohocorp.com","skyclub12@zoho.com","shameem.i@zohocorp.com","balasubramaniam.s@zohocorp.com","ranjith.v@zohocorp.com","swaroop.c@zohocorp.com","syedyusuf.s@zohocorp.com","vishnu.r@zohocorp.com","sannihith.m@zohocorp.com","kuuljiit.abroll@mark3.in","kirti.sharma@zohocorp.com","vasanth.velumani@zohocorp.com","ben.meredith@bentzu.com","viswa.akshaya+30@gmail.com","servicioalcliente@visiontecno.com","goutham.p@zohocorp.com","deepan.r+telephony@zohotest.com","vignesh.jn@zohocorp.com","gowriprasanth.v@zohocorp.com","venkateswaran.s+bigin16@zohotest.com","akshaya.v+bigint0@zohotest.com","viswa.akshaya+31@gmail.com","viswa.akshaya+32@gmail.com","abhishek.rc@zohocorp.com","admin@bitcode.pro","developer@bitcode.pro","karuppuchamy@zohocorp.com","karl@salesbridge.be","muthualagappan.m@zohocorp.com","rajarajan.k@zohocorp.com","jaiganeshb@zohocorp.com","srinivasan.p+as3esasds@zohotest.com","admin@rightbite.com","karthikeyan.santhanam@zohocorp.com","mohammed.idhiris+t5@zohotest.com","abc@us.com","shailesh@zohocorp.com","sairam.g@zohocorp.com","vigneashwaran.v@zohocorp.com","vijays@zohocorp.com","anandakumar.n@zohocorp.com","karthikeyan.jr@zohocorp.com","praveenvignesh.p@zohocorp.com","john.nash@gmail.com","raghavan.balchand@zohocorp.com","sadhika.sr@zohocorp.com","zohocrmlang+en@gmail.com","sakthivel.g@zohocorp.com","vijay.kk@zohocorp.com","sriram.kg@zohocorp.com","ana@ticservei.com","kundan.sarraf@saansinternational.com","viswa.akshaya+22@gmail.com","viswa.akshaya+21@gmail.com","craig@kandcpartners.com","adam@humanpixel.com.au","thilakraj.v@zohocorp.com","srikowsikaa.s@zohocorp.com","mitheshzoho@gmail.com","jose.aragon@conectaredatos.com","ragunanthan.cm@zohocorp.com","tsoares@ezdentalbilling.com","frank@hybriddigital.media","nickg@natdistalliance.com.au","vs@3vtk.net","arturo@coolbot.mx","nish@credinsure.com.au","info@krugxp.com","infos@madajob.mg","jeandre@makeitrain.biz","gabriel.lortie@manulifesecurities.ca","david@davidpainchaud.com","cynthia@kcrelationshipinstitute.com","harishankar.m@zohocorp.com","rahul.kr@zohocorp.com","sathish.m+123@zohotest.com","victor.m.dasilva@ouat.cc","praveenkumar.b@zohocorp.com","eshelnutt@artome.com",
+"publisher@epicgrandvalley.com","wes@wesfed.com","ronen.shahkoohi@zolamedia.com","ccoolen@zsphere.fr","masroor@templogic.biz","john@capcf.com","lakshminarayan.jk+fre@zohotest.com","diane@dianedarling.com","zsolt2.simon@gmail.com","francois.nanquette@generaction.fr","elyes.chelby@gmail.com","wetbisous@gmail.com","venessa@getuslocal.com","ginscaramelli@gmail.com","akshaya.d@zohocorp.com","padma.n@zohocorp.com","hazael+1t0@zohotest.com","sales@industrial-partner.com","ragunanthini.b@zohocorp.com","coo@explosivebusiness.com","beginzohocrm@gmail.com","karthee@teameverest.ngo","gabriels@expertizen.com.ar","vincent@chifoods.us","jagadesh.sankaranarayanan@zohocorp.com","mscott@3leafcrm.com","sujitha.devi+samplet0@zohotest.com","ajay.nj@zohocorp.com","ajaynatarajan2312@gmail.com","sujitha.devi+idct0t0@zohotest.com","sujitha.devi+idct0t1@zohotest.com","sujitha.devi+idct0t0@zohotest.com","lokesh.sr+biginoct91@zohotest.com","kaushal.s@zohocorp.com","ramsankar.cr@zohocorp.com","muralidharan.a+t1@zohotest.com","nitin@extensionerp.com","shubham@extensionerp.com","tarun@extensionerp.com","arunkumar.g+bigin2@zohotest.com","arunkumar.g+bigin3@zohotest.com","akshaya.v+crm@zohocorp.com","arunkumar.g+bigin5@zohotest.com","prabu.mohan+oct11@zohotest.com","vignesh.joshva+svj@zohotest.com","sakthivel.s+bug1@zohotest.com","vignesh.joshva@zohocorp.com","velayuthan.tv@zohocorp.com","arunkumar.g+bigin10@zohotest.com","prabu.mohan+oct14@zohotest.com","arunkumar.g+bigin34@zohotest.com","haribabu.p@zohocorp.com","venkateswaran.s+bigin17@zohotest.com","arunkumar.g+bigin99@zohotest.com","udhbhav.menon@zohocorp.com","luis.botello+1t0@zohotest.com","karen.k@zohocorp.com","prabu.mohan+oct16@zohotest.com","arunkumar.g+bigin23@zohotest.com","arunkumar.g+bigin33@zohotest.com","shebeeb.s@zohocorp.com","prithiviraj.i@zohocorp.com","santhosh.a@zohocorp.com","gavins@zohocorp.com","sravani.y@zohocorp.com","alan@mysupergeeks.com","rod@mysupergeeks.com","ceo@theeventzteam.com","sasinachimuthu.a@zohocorp.com","rod@abgroupcorp.com","akshaya.v+newbigin@zohotest.com","geo@ion8.net","steve@networkprintsolutions.co.uk","surendarfreezo@gmail.com","gibuk@zohocorp.com","prabu.mohan+oct21@zohotest.com","muthualagappan.m+bigin@zohotest.com","gowthamraj@zohocorp.com","muthu.kumar+test2@zohotest.com","bhargavi.s@zohocorp.com","shyamkumar.m@zohocorp.com","manoj.k@zohocorp.com","francisw@pssuper.com.au","peterr@pssuper.com.au","pavanreddy.n@zohocorp.com","zoho@i3-vietnam.tech","ryan.m@zohocorp.com","mukeshkumar.k@zohocorp.com","muniyakumar.d@zohocorp.com","prabakaran.r@zohocorp.com","manigandaprabu.v+djdjhjhd@zohotest.com","thoufeeq.a@zohocorp.com","saikrishna.b@zohocorp.com","ananthapadmanaban.n@zohocorp.com","gnanaelisa.r@zohocorp.com","alex.kirubakaran+live1@zohocorp.com","muthualagappan.m+bigintest@zohotest.com","lakshminarayan.jk+live2@zohotest.com","dinesh.ps@zohocorp.com","me@rameshganapathy.com","abdomagdyy33@gmail.com","saravanan.selvaraj@zohocorp.com","vivek.sb+1@zohotest.com","jatin7412@gmail.com","devakumar.k@zohocorp.com","sathyanayagan.n@zohocorp.com","vivek.sb+2@zohotest.com","jothikumar398@gmail.com","aravind.kr@zohocorp.com","alwyn.francis@virtutem.com","simon.s@zohocorp.com","simonpackiaraj29+a1@gmail.com","simonpackiaraj29@gmail.com","simonpackiaraj@gmail.com","harish.rs@zohocorp.com","gowtham.mm@zohocorp.com","madankumar.r@zohocorp.com","hazael@zohocorp.com","akshaya.v+test123@zohotest.com","stephan.kreutzer@liebper.de","akshaya.v+bigin1@zohotest.com","sathish.m+1234@zohotest.com","srividhya.b@zohocorp.com","paul@conscioustek.com","abisha.g@zohocorp.com","giridharan.s+bigin@zohotest.com","senthilkumar.s@zohocorp.com","harika.y@zohocorp.com","vidyavasu@zohocorp.com","aravind.sr@zohocorp.com","earnest.j@zohocorp.com","vasanth.sankar@zohocorp.com","lnolette@amchamquebec.com","joel.jjerrin+t0@zohotest.com","vivek.sb+3@zohotest.com","shiva.ganesan@zohocorp.com","thiyagaraj.d428@zohotest.com","anand.p@zohocorp.com","vivek.sb+5@zohotest.com","vivek.sb+4@zohotest.com","vivek.sb+6@zohotest.com","revathi.renganathan@zohocorp.com","matchendran.s+biginpub@zohotest.com","akshaya.v+bigincrm@zohotest.com","sdksdfjs@sdf.sdfs","akshaya.v+bigincrm1@zohotest.com","akshaya.v@zohocorp.com","dfgjdsfkgdjsfgk@sdfsd.fsdfs","thiyagaraj.d436@zohotest.com","prabu.mohan+nov26@zohotest.com","prabu.mohan+nov26p0@zohotest.com","muralidharan.a+l1t1@zohotest.com","akshaya.v+bigincrm2@zohotest.com","venkateswaran.s+bigin111@zohotest.com","manoj.s@zohocorp.com","arunkumar.g+32@zohotest.com","admin@htca.com.au","vivek.sb+7@zohotest.com","nporwal@ottawaheroes.ca","kumaran.r@zohocorp.com","philip@sportdogfood.com","prathap.joshi@zohocorp.com","gururajasubbaiah+bigin@gmail.com","storedemous@zohomail.com","ljljljik@asdsa.com","ramkishorekg@gmail.com","karthipanraj.k+biginlocal@zohocorp.com","karthipanraj.k+gnanam@zohocorp.com","karthipanrajit@gmail.com","nittin.j@zohocorp.com","jayashankari.s@zohocorp.com","hjkm@hjnkm.com","manigandaprabu.v@zohocorp.com",
+"jake@jakepartee.com","kamthapa93.2@gmail.com","haritha.y@zohocorp.com","johan.linde.se@gmail.com","webmaster@syellen.se","bigintesteu1@gmail.com","balasundar.c@zoho.com","thiyagaraj.d447@zohotest.com","priya.cg@zohocorp.com","lakshminarayan.jk+nov30@zohotest.com","contact@mithilawasi.org","cassyrtr@gmail.com","ponmala.k+dec02_19@zohotest.com","manojkumar.sn+12bigin@zohotest.com","hariram.sm@zohocorp.com","finprouae@gmail.com","lokesh.k@zohocorp.com","wesley.cortes@hillsong.com","akshaya.v+bigincrm3@zohotest.com","marcoscustodio@webpeak.com.br","sandor.lelekacs@felho.net","sztaho.david@gmail.com","arunkumar.g+cn23@zohotest.com","c.garcia@marketplacetest.info","varun.suresh@zohocorp.com","nitin.s@zohocorp.com","samuel@zohodev.onmicrosoft.com","erpsystem@rebiz.com","dclark@trendspire.com","mohamed.diaa@pinerium.com","pramila.magesh@zohocorp.com","pazhamalai.m+t0@zohotest.com","qazxww@sdfsdf1212sdf.onmicrosoft.com","satz@satzcomp.onmicrosoft.com","surya.ravi@zohocorp.com","chad.senna@csprotech.com","vaibhav@kavasa.in","admin@srcorp010.onmicrosoft.com","jothikumr.r+t0@zohotest.com","bigintesting@solutiontest.com","jags@solutiontest.com","onehourmentor@gmail.com","rdorris@waveware.com","qazxsw@satz1122.onmicrosoft.com","satz@satz1122.onmicrosoft.com","jothikumar.r+t0@zohotest.com","mohammed.idhiris+t0@zohotest.com","hello@futurescape.in","ponmala.k+dec11_19@zohotest.com","cigandhi@emcogroup.in","jonathon.m@ilobby.com","ria.rex@zohocorp.com","vishnnu.viswanath@zohocorp.com","testacco996@gmail.com","monarchthecleaners@gmail.com","surendar.u@zohocorp.com","knandipati@s-squaresystems.com","akash.vk@zohocorp.com","sumod.s@strat-agile.com","sam@physivert.com","rajanalyticals@gmail.com","aravind.ks@zohocorp.com","suraj@coolcoach.org","raj@mactech.asia","avudai.m@zohocorp.com","carlosyaucsbrokers@hotmail.com","lino@mtechsales.net","rakesh.kamble@eurokidsindia.com","arul.belarmine@zohocorp.com","immaculate.bharati@zohocorp.com","mullai.e@zohocorp.com","dhanya@rajashreematch.com","alananeves@icloud.com","felipe@web4leads.cl","vigneshwaran.kr@zohocorp.com","arunraj.j@zohocorp.com","mohammed.idhiris+lan@zohotest.com","topperidhiris@gmail.com","sales@honeytranslations.com","lihang@zohocorp.com","karthik.murugesan+zone@zohotest.com","muthuprakash.r@zohocorp.com","sam@newtechnicalperspective.com","murari@idnetsys.com","skouri@especialneeds.com","ajay@gpaco.net","ankita@gpaco.net","jcampbell@idssite.com","ies@iitcs.com","alexmagno@cdho.com.br","lmondragonp@hotmail.com","mf.dhwani@gmail.com","contact@zapier.com","putraprofbob2@gmail.com","niall@channelsight.com","rjalmario@zoho.com","saurabh@vacationlabs.com","soundirarajan.s@zohocorp.com","hussain@eventify.io","akshaya.v+bigin2@zohotest.com","ponmala.k+dec16_19@zohotest.com","navyasree.b@zohocorp.com","dferguson@three30group.com","anoop.nistane@gmail.com","customer_demo@yingxiao668.com","geetanjali@vizexperts.com","dhruv@dhruvkumarjha.com","hariharan.l@zohocorp.com","aravindmail2012@gmail.com","aravind.m@zohocorp.com","aravind.m+4@zohocorp.com","balasundari93@gmail.com","maanasa.s@zohocorp.com","balasundari.p@zohocorp.com","mahesh.s@zohocorp.com","sales.admin@edyoda.com","rohantestingapps@gmail.com","visalakshi.mg@zohocorp.com","lucero.h+1t0@zohotest.com","john@capitalbusinesssoftware.com","flearningstudio@gmail.com","raju@greenwaysgroup.com","balasaraswathy.g@zohocorp.com","raghav@insidedigital.in","gfjdaca@gmail.com","badar.zaman@codeninja.pk","imibrar@gmail.com","mukhtar@codeninja.pk","nadeem@codeninja.pk","usman@codeninja.pk","lakshmanan.kn@zohocorp.com","goutham.a@zohocorp.com","arn44480@gmail.com","mrbadvisors@gmail.com","admin@bigin2411.onmicrosoft.com","shyam.prabhakaran@zohocorp.com","akshaya.v+bigin4@zohotest.com","akshaya.v+bigin6@zohotest.com","akshaya.v+bigin5@zohotest.com","register@thamizhmozhi.com","roshan.s@zohocorp.com","designwalls7@gmail.com","pioneer.kamaldeep@gmail.com","pioneer.simran@gmail.com","pioneerlazertech@gmail.com","ken@wiserretire.com","info@amivision.in","juontonio@levridge.org","support@advisorzaroorihai.com","aaditya@adspl.in","soorya@ohosolutions.in","mustaq.n@gmail.com","ramgopal@adspl.in","kartik@uniserved.com","shreyas.seshadri@hostes.in","jmu@specialisteinternet.fr","vivek.krishna@zohocorp.com","manimaran.s@zohocorp.com","leonardo.coelho@otentecnologia.com.br","r.sabhlok@zohocorp.com","lakshmanraj.s+aalam@zohocorp.com","anithar+aalam@zohocorp.com","selvarasu.k+sampletest@zohocorp.com","ponmala.k+dec20_19@zohotest.com","ananda.verma@wolkus.com","admin@zylkrr.onmicrosoft.com","support@casagardening.com","kishore.sahasranaman@mariapps.com","accounts@pingims.com","erkan@melares.com","akshaya.v+biginswitch1@zohotest.com","samuel@gsicctv.co.id","deepan.r+rc@zohotest.com","autohausagustin@gmail.com","mattkoop@aurelian-group.com","toshniwalrahul101@gmail.com","philippe.bodart@webriq.com","info@webriq.us","akshaya.v@zohocorp.com",
+"arunkumar.g@zohocorp.com","gururajasubbaiah.sj@zohocorp.com","kalyan.pavan@zohocorp.com","lakshminarayan.jk@zohocorp.com","lokesh.sr@zohocorp.com","meenaloshini.r@zohocorp.com","muralidharan.a+template_t0@zohotest.com","ponmala.k@zohocorp.com","prabu.mohan@zohocorp.com","sathish.m@zohocorp.com","venkateswaran.s@zohocorp.com","vivek.sb@zohocorp.com","a.amer@ip4solutions.com","info@specialeventdjz.com","info@glasstechengineering.com","muniyakumar6@zohotest.com","vignesh.ravichandran@zohocorp.com","vickyjade15@gmail.com","nithyashreeiyengar@gmail.com","manojkumar.sn+12ss@zohotest.com","akshaya.v+biginswitch@zohotest.com","abhinaya.r@zohocorp.com","sdjsdfj@gmail.com","efr@popatelier.net","prabu.mohan+dec26@zohotest.com","asdjasjk@awsdas.dasd","karthik.murugesan@zohocorp.com","thiyagaraj22@zohotest.com","thiyagaraj.d20@zohotest.com","erik.elmer@pfc-group.com","maruthupandi.k@zohocorp.com","thien@qtsc-it.com","manivannan.r@zohocorp.com","susheel@10xbiz.co","aravind.kathiresan@zohocorp.com","sravan@abdadigital.com","varun.kebab@gmail.com","cincspaceux@gmail.com","adam.sandler@ksource.tech","n.aadarsh93@gmail.com","n.tester93+1@gmail.com","n.tester93@gmail.com","sangeetharajesh.s@zohocorp.com","sathish.m@zohocorp.com","satzdual@gmail.com","sdfjsdfioirsfjnenwruijkn@asdfassd.asdassd","venkateswaran.s+bigin20@zohotest.com","manager@bolle7.com","ajaymittal09@gmail.com","admin@musegravity.company","reuben.sj@zohocorp.com","admin@rockfound.in","user.salesman@gmail.com","vignesh.shan.911@gmail.com","varshsridh54@gmail.com","techiebrois@gmail.com","andrewjoseph283@yahoo.com","prabu.mohan+testdec31@zohotest.com","mohammed.idhiris+t1@zohotest.com","sumanth.g+bigint0@zohotest.com","sandeepv@saleszoomer.com","harsh@noblealchem.com","naplbwnoffice@gmail.com","mohammed.idhiris+t01@zohotest.com","guna@abstrakt.in","subramaniancv1@gmail.com","bala.lenin@krishcastrapping.com"
+};	//No i18N 
+
+IAMProxy iamProxy = IAMProxy.getInstance();
+UserAPI userAPI = iamProxy.getUserAPI();
+ServiceOrgAPI serviceOrgAPI = ZohoCRMIAMUtil.getServiceOrgAPI();
+HashSet zgidList=new HashSet();
+for(String email_id : email_Ids)
+{
+	try {
+		User user=userAPI.getUser(email_id);
+		if(user!=null && user.isActive())
+		{
+    	List<ServiceOrg> serviceOrgList = serviceOrgAPI.getAllServiceOrgs(AccountsConstants.ServiceOrgType.CRM.getType(), user.getZUID());
+    	ServiceOrg[] orgs = serviceOrgList != null && !serviceOrgList.isEmpty() ? serviceOrgList.toArray(new ServiceOrg[0]) : null;
+	if (serviceOrgList != null && !serviceOrgList.isEmpty()) {
+		List<ServiceOrg> envList = ZohoCRMIAMUtil.getEnvironmentServiceorgs(CrmEnvironment.BIGIN, orgs);
+        		if (envList != null && !envList.isEmpty()) {
+			for (ServiceOrg serviceOrg : envList) {
+        				String zgId = "" + serviceOrg.getZSOID();
+        				if(zgId!=null){
+        					zgidList.add(zgId);
+        				}
+			}
+        		}
+    	}
+	}
+ 	} catch (Exception e) {
+ 		System.out.println("EXCEPTION IN GETTING IAM GROUP ID::"+e);//No i18N
+ 		LOGGER.log(Level.SEVERE,"EXCEPTION IN GETTING IAM GROUP ID::"+e);//No i18N	
+ 	}
+	}
+
+out.println("started all");//No I18N
+out.println("zgids=> "+zgidList);  //No i18N
+Iterator<String> it = zgidList.iterator();
+while ( it.hasNext() )
+{
+	String zgid=it.next();
+	System.out.println("running migration for => "+zgid);
+	out.println("running migration for => "+zgid);//No i18N
+	SASThreadLocal.setThreadLocalForDomain(zgid);
+	modifyEventLayout(zgid,LOGGER);
+	modifyProductForFree(LicenseUtil.getLicenseType(),zgid,LOGGER);
+}
+}
+catch(Exception ex)
+{ 
+	out.println("Exception in migration"+ex); //NO i18N
+	}
+
+	%>
+	
+	<%!
+public void modifyEventLayout(String zgid,Logger LOGGER) throws Exception{
+	
+	try{
+		Persistence per = PersistenceCacheUtil.getPersistenceLiteHandle(zgid);
+		DataObject fielddObj=FieldUtil.getFieldsDOForModule(CrmModuleConstants.EVENTS, zgid);
+		
+		if(fielddObj!=null && !fielddObj.isEmpty()){
+			String tabId=""+fielddObj.getRow(CRMFIELD.TABLE).get(CRMFIELD.TABID);
+			Long layoutId=PageLayoutUtil.getSystemdefinedActiveLayout(Long.parseLong(tabId),zgid);
+			HashMap<String, Long> sectionPKVsSection_ID = SectionUtil.getSectionPKVsSection_IDMap(Long.valueOf(tabId), layoutId, null, zgid);
+			Long section_IdForSection1 = null;
+			if(sectionPKVsSection_ID != null){
+				String pkKey = new StringBuilder().append(layoutId).append('_').append(1L).append('_').append(1L).toString();
+				section_IdForSection1 = sectionPKVsSection_ID.get(pkKey);
+			}
+			HashMap fieldMap=new HashMap();
+			if(fielddObj!=null && !fielddObj.isEmpty()){
+				String contactId=fielddObj.getRow(CRMFIELD.TABLE, new Criteria(Column.getColumn(CRMFIELD.TABLE,CRMFIELD.COLUMNNAME ),"CONTACTID",QueryConstants.EQUAL)).get(CRMFIELD.FIELDID).toString();//No i18N
+				
+				SelectQuery sQry = new SelectQueryImpl(Table.getTable(CRMMODEFIELD.TABLE));
+				sQry.addSelectColumn( Column.getColumn(null,"*") );
+				Criteria modcr=new Criteria(Column.getColumn(CRMMODEFIELD.TABLE, CRMMODEFIELD.TABID), tabId , QueryConstants.EQUAL);
+				sQry.setCriteria(modcr);
+				DataObject modfieldObj = per.get(sQry);
+				
+				Criteria cr=new Criteria(Column.getColumn(CRMMODEFIELD.TABLE,CRMMODEFIELD.FIELDID ),contactId,QueryConstants.EQUAL);
+				Row contRow=modfieldObj.getRow(CRMMODEFIELD.TABLE,cr);
+				if(contRow==null)
+				{
+					Row contactRow=new Row(CRMMODEFIELD.TABLE);
+					contactRow.set(CRMMODEFIELD.FIELDID, contactId);
+					contactRow.set(CRMMODEFIELD.FIELDSEQUENCE,9);
+					contactRow.set(CRMMODEFIELD.SECTIONID,1);
+					contactRow.set(CRMMODEFIELD.SECTION_ID,section_IdForSection1);
+					contactRow.set(CRMMODEFIELD.LAYOUTID,layoutId);
+					contactRow.set(CRMMODEFIELD.MODE,1);
+					contactRow.set(CRMMODEFIELD.TABID, tabId);
+					contactRow.set(CRMMODEFIELD.WIZARDID,null);
+					contactRow.set(CRMMODEFIELD.ELEMENT_TYPE,1);
+					
+					modfieldObj.addRow(contactRow);
+					System.out.println("row added");
+				}
+				else
+				{
+					contRow.set(CRMMODEFIELD.SECTIONID, 1);
+					contRow.set(CRMMODEFIELD.SECTION_ID, section_IdForSection1);
+					contRow.set(CRMMODEFIELD.FIELDSEQUENCE,9);
+				//	contRow.set(CRMMODEFIELD.LAYOUTID,layoutId);
+				//	contRow.set(CRMMODEFIELD.MODE,1);
+					modfieldObj.updateRow(contRow);
+					System.out.println("row updated");
+				}
+				
+				per.update(modfieldObj);
+			}
+		}
+	}catch(Exception e){
+		
+       System.out.println("Exception occurred while editing default events layout for Ignite user ::"+e);
+        LOGGER.log(Level.INFO,"Exception occurred while editing default events layout for Ignite user ::"+e);
+		throw e;
+	}
+}
+%>
+<%!
+public void modifyProductForFree(String licenseType,String zgid,Logger LOGGER) throws Exception
+	{
+	  try{
+	 		 if( "B".equalsIgnoreCase(licenseType))	//If The user is in Free License
+	 		{	  Persistence per = PersistenceCacheUtil.getPersistenceLiteHandle();
+	 		
+	 		 	  Long productTabId = TabUtil.getTabIdByName(CrmModuleConstants.PRODUCTS);
+	 		 	  Long linkTabId = TabUtil.getTabIdByName("LinkingModule1");  //No i18N
+	 		 	
+	 			  HashSet<Long> tabIds=new HashSet<Long>();
+	 			  tabIds.add(productTabId);
+	 			  tabIds.add(linkTabId);
+	 			  DataObject tabDO=getTabsDO(tabIds);
+	 			  Row proRow=tabDO.getRow(CRMTAB.TABLE,new Criteria(Column.getColumn(CRMTAB.TABLE, CRMTAB.TABID), productTabId , QueryConstants.EQUAL));
+	 			  
+	 			  if(!"1".equalsIgnoreCase(CRMTAB.PRESENCE))  //If product module already present skip
+	 			  {
+	 			  proRow.set(CRMTAB.PRESENCE,1);
+	 			  tabDO.updateRow(proRow);
+
+				  Row linkRow=tabDO.getRow(CRMTAB.TABLE,new Criteria(Column.getColumn(CRMTAB.TABLE, CRMTAB.TABID), linkTabId , QueryConstants.EQUAL));
+				  linkRow.set(CRMTAB.PRESENCE,1);
+				  tabDO.updateRow(linkRow);
+				  per.update(tabDO);
+				  LOGGER.log(Level.INFO,"linking module  and product module enabled for {0}",zgid);
+				  
+				  Long dealsTabId = TabUtil.getTabIdByName(CrmModuleConstants.POTENTIALS);
+				  Long dealLinkField =FieldUtil.getFieldIdFromTabIdAndColumnName(dealsTabId,"LINKINGMXN1"); //No i18N
+				  HashSet dealLinkFields=new HashSet();
+				  dealLinkFields.add(dealLinkField);
+				  DataObject DealFldDO=FieldUtil.getFieldDOByFieldsIds(dealLinkFields);
+				  Row dealRow=DealFldDO.getFirstRow(CRMFIELD.TABLE);
+				  dealRow.set(CRMFIELD.PRESENCE,1);
+				  DealFldDO.updateRow(dealRow);
+				  per.update(DealFldDO);
+				  LOGGER.log(Level.INFO,"linking field in potentials enabled for {0}",zgid);
+				  
+				  HashMap listMap=new HashMap();
+				  listMap.put("PRODUCTSPERSONALITY", 6); //No i18N
+				  RelatedListUtil.updateRelatedList(listMap,dealsTabId);
+				  LOGGER.log(Level.INFO,"product personality added to deal for {0}",zgid);
+				  
+				  Long asociProField =FieldUtil.getFieldIdFromTabIdAndColumnName(linkTabId,"LINKINGCF111"); //No i18N
+				  HashSet asociProFields=new HashSet();
+				  asociProFields.add(asociProField);
+				  DataObject asociProFldDO=FieldUtil.getFieldDOByFieldsIds(asociProFields);
+				  if(asociProFldDO!=null && asociProFldDO.size(CRMFIELD.TABLE)>0)
+				  {
+				  Row asociProRow=asociProFldDO.getFirstRow(CRMFIELD.TABLE);
+				  asociProRow.set(CRMFIELD.PRESENCE,1);
+				  asociProFldDO.updateRow(asociProRow);
+				  per.update(asociProFldDO);
+				  }  
+				  LOGGER.log(Level.INFO,"linking field in linking module enabled for {0}",zgid);
+				  
+	 			  }
+	 			  else
+	 			  {
+	 				  LOGGER.log(Level.INFO, "skipping the product module for {0} in free cause product module already present",zgid);
+	 			  } 
+	 		}	
+	}
+	  catch(Exception ex)
+	  {
+		  LOGGER.log(Level.SEVERE, new StringBuilder("exception while updating products module for ").append(zgid).append("=>exception=>").append(ex).toString());
+	  }
+	  
+	}
+%>
+<%!
+
+public DataObject getTabsDO(Set<Long> tabIds)throws Exception
+{
+	SelectQuery sq = new SelectQueryImpl(Table.getTable(CRMTAB.TABLE));
+	sq.addSelectColumn(Column.getColumn(null,"*"));
+	sq.setCriteria(new Criteria(Column.getColumn(CRMTAB.TABLE, CRMTAB.TABID), tabIds.toArray(), QueryConstants.IN));
+	return PersistenceCacheUtil.getPurePersistenceLiteHandle().get(sq);
+}
+%>
