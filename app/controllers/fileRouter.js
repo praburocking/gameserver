@@ -2,6 +2,8 @@ const fileRouter = require('express').Router()
 //const User = require('../../model/user')
 const multer=require('multer')
 const util=require('../utils/util')
+const File =require('../models/uploads')
+var fs = require('fs');
 
 
 
@@ -41,6 +43,47 @@ fileRouter.get('/list',async(req,res)=>{
     catch(exp)
     {
         res.status(500).json({message:"exception while getting files list"});
+        console.log("exception while getting the file ",exp);
+    }
+})
+
+
+fileRouter.get('/download/:id',async(req,res)=>{
+    try{
+        console.log("id ",req.params.id);
+      const id=req.params.id;
+      const file=await File.findOne({_id:id})
+      if(file && res.locals.user_id===file.user_id)
+      {
+          res.download('uploads/'+file._id,file.name);
+      }
+
+    }
+    catch(exp)
+    {
+        res.status(500).json({message:"exception while getting files list"});
+        console.log("exception while getting the file ",exp);
+    }
+})
+
+fileRouter.delete('/:id',async(req,res)=>{
+    try{
+        console.log("id ",req.params.id);
+      const id=req.params.id;
+      const file=await File.deleteOne({_id:id,user_id:res.locals.user_id})
+      if(file)
+      {
+          res.status(200).json({message:"file deleted"});
+      }
+      else
+      {
+        res.status(500).json({message:"file deleted"});
+      }
+
+    }
+    catch(exp)
+    {
+        res.status(500).json({message:"exception while deleting files list"});
         console.log("exception while getting the file ",exp);
     }
 })
