@@ -55,9 +55,13 @@ fileRouter.get('/download/:id',async(req,res)=>{
       const file=await File.findOne({_id:id})
       if(file && res.locals.user_id===file.user_id)
       {
-          res.download('uploads/'+file._id,file.name);
-      }
-
+          console.log("format ",file.format);
+          res.download('uploads/'+file._id,file.name,function(err) {console.log("error",err)});
+    //      res.writeHead(200, {
+    //         "Content-Type": "application/octet-stream",
+    //         "Content-Disposition" : "attachment; filename=" + '112610615_1570173724437.pdf'});
+    //       fs.createReadStream('/Volumes/Personal/fulstack/gameserver/uploads/'+'112610615_1570173724437.pdf').pipe(res);
+       }
     }
     catch(exp)
     {
