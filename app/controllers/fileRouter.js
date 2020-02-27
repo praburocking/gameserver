@@ -75,8 +75,16 @@ fileRouter.delete('/:id',async(req,res)=>{
         console.log("id ",req.params.id);
       const id=req.params.id;
       const file=await File.deleteOne({_id:id,user_id:res.locals.user_id})
+      
       if(file)
-      {
+      {   try{ 
+           await fs.unlinkSync('uploads/'+id)
+            }
+            catch(exp)
+            {
+                console.log("exception while getting the file ",exp);
+            }
+
           res.status(200).json({message:"file deleted"});
       }
       else
