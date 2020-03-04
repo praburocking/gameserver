@@ -1,31 +1,19 @@
 const fileRouter = require('express').Router()
 //const User = require('../../model/user')
-const multer=require('multer')
+// const multer=require('multer')
 const util=require('../utils/util')
 const File =require('../models/uploads')
 var fs = require('fs');
-
-
+const stream=require('stream')
 
 
 
 fileRouter.post('/upload',async (req,res)=>{
     try{
-
-        console.log("file1 => ",req.files.file);
+       
         const upload=req.files.file;
-        let file= await util.addFile(upload.name, upload.mimetype,res.locals.user_id,"test@1233",upload.size,upload.encoding,upload.md5,upload.truncated)
-        file=file.toJSON()
-        upload.mv('uploads/'+file.id, (error) => {
-            if (error) {
-                console.error(error);
-                res.status(500).json('error while writing your file to disk');
-            }
-            else
-            {
-                res.status(200).json(file);
-            }
-          })
+       let file= await util.encAndaddFile(upload,req.body.key,res.locals.user_id);
+        res.status(200).json(file);
     }
     catch(exp)
     {
@@ -37,7 +25,7 @@ fileRouter.post('/upload',async (req,res)=>{
 
 fileRouter.get('/list',async(req,res)=>{
     try{
-       const files= await util.getFiles();
+       const files= await util.getFiles(res.locals.user_id);
        res.status(200).json([...files]).send();
     }
     catch(exp)
@@ -48,19 +36,16 @@ fileRouter.get('/list',async(req,res)=>{
 })
 
 
-fileRouter.get('/download/:id',async(req,res)=>{
+fileRouter.post('/download/:id',async(req,res)=>{
     try{
         console.log("id ",req.params.id);
       const id=req.params.id;
       const file=await File.findOne({_id:id})
       if(file && res.locals.user_id===file.user_id)
-      {
+      {    
           console.log("format ",file.format);
-          res.download('uploads/'+file._id,file.name,function(err) {console.log("error",err)});
-    //      res.writeHead(200, {
-    //         "Content-Type": "application/octet-stream",
-    //         "Content-Disposition" : "attachment; filename=" + '112610615_1570173724437.pdf'});
-    //       fs.createReadStream('/Volumes/Personal/fulstack/gameserver/uploads/'+'112610615_1570173724437.pdf').pipe(res);
+          console.log("req body",req.body);
+          fileContent=await util.downloadFile('uploads/'+file._id+'.enc',req.body.key+file.private_key,res,file);
        }
     }
     catch(exp)
@@ -70,6 +55,8 @@ fileRouter.get('/download/:id',async(req,res)=>{
     }
 })
 
+
+
 fileRouter.delete('/:id',async(req,res)=>{
     try{
         console.log("id ",req.params.id);
@@ -78,7 +65,7 @@ fileRouter.delete('/:id',async(req,res)=>{
       
       if(file)
       {   try{ 
-           await fs.unlinkSync('uploads/'+id)
+           await fs.unlinkSync('uploads/'+id+'.enc')
             }
             catch(exp)
             {
