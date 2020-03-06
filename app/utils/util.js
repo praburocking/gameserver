@@ -134,6 +134,18 @@ const encAndaddFile=async (upload,key,user_id)=>
 }
 
 
+const decrypt = function(text, cipherKey,initVect){
+  var decipher = crypto.createDecipheriv('aes256', cipherKey, initVect);
+  try {
+      var dec = decipher.update(text,'hex','utf8');
+      dec += decipher.final('utf8');
+      return dec;
+  } catch (ex) {
+      console.log('failed');
+      return;
+  }
+}
+
 const downloadFile=async(filePath,key,res,file)=>
 {
   try{
@@ -154,6 +166,8 @@ const downloadFile=async(filePath,key,res,file)=>
     var data;
     try{
       var data=readStream.pipe(decipher)
+     
+     console.log("data ",data);
     }
     catch(exp)
     {
@@ -164,7 +178,7 @@ const downloadFile=async(filePath,key,res,file)=>
     }
     catch(exp)
     {
-      
+      console.log("exception while decrypting ",exp);
     }
     
     }

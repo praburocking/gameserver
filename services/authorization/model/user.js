@@ -18,7 +18,8 @@ const userSchema=new mongoose.Schema({
     name:{type:String,required:true},
     email:{type:String,unique:true,required:true},
     passwordHash:{type:String,required:true,minlength:8},
-    isVerified:{type:Boolean,required:true}
+    isVerified:{type:Boolean,required:true},
+    maxFileSize:{type:Number,required:true}
   })
 
 

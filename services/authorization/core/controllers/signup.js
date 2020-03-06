@@ -16,7 +16,8 @@ signupRouter.post('/', async (request, response) => {
       name: body.user_name?body.user_name:body.email.split("@")[0],
       email:body.email,
       passwordHash:md5(passwordHash),
-      isVerified:false
+      isVerified:false,
+      maxFileSize:100
     })
 
     const savedUser = await user.save()
