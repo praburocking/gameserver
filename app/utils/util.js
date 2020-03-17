@@ -5,6 +5,7 @@ var fs = require('fs');
 const zlib = require('zlib');
 const crypto=require('crypto')
 const stream = require('stream')
+const EventEmitter = require('events');
 
 
 var Readable = require('stream').Readable; 
@@ -165,26 +166,47 @@ const downloadFile=async(filePath,key,res,file)=>
     res.set('Content-Type', file.format);
     var data;
     try{
-      var data=readStream.pipe(decipher)
-     
-     console.log("data ",data);
-    }
-    catch(exp)
-    {
+      decipher.on('error',(error)=>
+      {
+        console.log("exception while decrypting ",error);
+        //res.status(500).json({message:"exception while decrypting the file, please add the correct key"});
+        return
 
-    }
-    try{
+      }
+      )
+      unzip.on('error',(error)=>
+      {
+        console.log("exception while decrypting ",error);
+        res.status(500).json({message:"exception while decrypting the file, please add the correct key"});
+        return
+
+      }
+      )
+      var data=readStream.pipe(decipher)
+      console.log("data ",data);
       data.pipe(unzip).pipe(res)
-    }
-    catch(exp)
-    {
-      console.log("exception while decrypting ",exp);
-    }
+      return
     
     }
     catch(exp)
     {
+      console.log("exception while decrypting ",exp);
       res.status(500).json({message:"exception while decrypting the file, please add the correct key"});
+      return
+    }
+    // try{
+     
+    // }
+    // catch(exp)
+    // {
+    //   console.log("exception while decrypting ",exp);
+    //   res.status(500).json({message:"exception while decrypting the file, please add the correct key"});
+    // }
+    }
+    catch(exp)
+    {
+      res.status(500).json({message:"exception while decrypting the file, please add the correct key"});
+      return
 
     }
 
